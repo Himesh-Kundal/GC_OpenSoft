@@ -1,0 +1,94 @@
+version: "3.9"
+
+networks:
+  internal_network_GC: # Backend & Redis only
+    driver: bridge
+  public_network_GC: # Exposed services (Frontend & Nginx)
+    driver: bridge
+
+services:
+  redis:
+    image: redis:latest
+    container_name: GC_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - internal_network_GC
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: GC_go_backend
+    restart: always
+    environment:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - internal_network_GC
+      - public_network_GC
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: GC_frontend_builder
+    volumes:
+      - GC_frontend_dist:/GC_frontend_dist
+    networks:
+      - public_network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - GC_frontend_dist:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+    networks:
+      - public_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  GC_frontend_dist:
