@@ -15,6 +15,8 @@ WORKDIR /root/
 
 RUN apk --no-cache add ca-certificates
 
+ENV REDIS_ADDR=redis:6379
+
 COPY --from=builder /app/main .
 
 EXPOSE 8080
