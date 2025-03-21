@@ -13,14 +13,12 @@ import (
 )
 
 func main() {
-	// Load environment variables
-	config.LoadEnv()
 
 	// Initialize Redis client
 	redis.InitRedis()
 
 	// Load employees into Redis
-	utils.LoadEmployeesToRedis("employee.json")
+	utils.LoadEmployeesToRedis("./employee.json")
 
 	// Set up router
 	router := mux.NewRouter()

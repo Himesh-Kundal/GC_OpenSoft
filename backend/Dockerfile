@@ -13,11 +13,12 @@ FROM alpine:latest
 
 WORKDIR /root/
 
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates curl
 
 ENV REDIS_ADDR=redis:6379
 
 COPY --from=builder /app/main .
+COPY employee.json ./employee.json
 
 EXPOSE 8080
 
