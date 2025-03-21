@@ -58,28 +58,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: GC_frontend_builder
-    volumes:
-      - GC_frontend_dist:/GC_frontend_dist
-    networks:
-      - public_network_GC
-
-  nginx:
-    image: nginx:latest
-    container_name: nginx_proxy
-    restart: always
-    depends_on:
-      backend:
-        condition: service_healthy
-      frontend:
-        condition: service_started
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - GC_frontend_dist:/usr/share/nginx/html:ro
+    container_name: GC_frontend
     ports:
       - "80:80"
     networks:
       - public_network_GC
+    depends_on:
+      backend:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:

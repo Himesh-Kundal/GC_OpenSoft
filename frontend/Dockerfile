@@ -1,4 +1,5 @@
-FROM node:23 AS builder
+# Stage 1: Build frontend
+FROM node:20 AS builder
 
 WORKDIR /app
 
@@ -9,4 +10,16 @@ COPY . .
 
 RUN npm run build
 
-CMD ["cp", "-r", "/app/dist", "/GC_frontend_dist"]
+FROM nginx:latest
+
+WORKDIR /usr/share/nginx/html
+
+RUN rm -rf ./*
+
+COPY --from=builder /app/dist ./
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
