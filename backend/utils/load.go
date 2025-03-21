@@ -1,16 +1,13 @@
 package utils
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-
 	"backend/redis"
 )
 
-// Employee struct for JSON data
 type Employee map[string]interface{}
 
 func LoadEmployeesToRedis(filename string) {
@@ -26,7 +23,7 @@ func LoadEmployeesToRedis(filename string) {
 
 	for empID, empData := range employees {
 		empJSON, _ := json.Marshal(empData)
-		err := redis.RedisClient.Set(context.Background(), empID, empJSON, 0).Err()
+		err := redis.SetValue(empID, string(empJSON))
 		if err != nil {
 			log.Printf("Failed to store employee %s: %v", empID, err)
 		}

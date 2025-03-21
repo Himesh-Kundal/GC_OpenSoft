@@ -12,6 +12,7 @@ import (
 
 var RedisClient *redis.Client
 var ctx = context.Background()
+var RedisNil = redis.Nil
 
 func InitRedis() {
 	redisAddr := config.GetEnv("REDIS_ADDR", "localhost:6379")
@@ -36,4 +37,16 @@ func checkRedisConnection() error {
 		time.Sleep(3 * time.Second)
 	}
 	return fmt.Errorf("failed to connect to Redis after multiple attempts")
+}
+
+func GetValue(key string) (string, error) {
+	return RedisClient.Get(ctx, key).Result()
+}
+
+func SetValue(key, value string) error {
+	return RedisClient.Set(ctx, key, value, 0).Err()
+}
+
+func Ping () (string, error) {
+	return RedisClient.Ping(ctx).Result()
 }

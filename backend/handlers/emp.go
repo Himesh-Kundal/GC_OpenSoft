@@ -1,13 +1,10 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
-	backendRedis "backend/redis"
-	"github.com/go-redis/redis/v8"
+	"backend/redis"
 )
 
-// Get employee details from Redis
 func GetEmployeeHandler(w http.ResponseWriter, r *http.Request) {
 	empID := r.URL.Query().Get("id")
 	if empID == "" {
@@ -15,8 +12,8 @@ func GetEmployeeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	empData, err := backendRedis.RedisClient.Get(context.Background(), empID).Result()
-	if err == redis.Nil {
+	empData, err := redis.GetValue(empID)
+	if err ==  redis.RedisNil{
 		http.Error(w, "Employee not found", http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -28,9 +25,8 @@ func GetEmployeeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(empData))
 }
 
-// Health check handler
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := backendRedis.RedisClient.Ping(context.Background()).Result()
+	_, err := redis.Ping()
 	if err != nil {
 		http.Error(w, "Redis is unavailable", http.StatusServiceUnavailable)
 		return

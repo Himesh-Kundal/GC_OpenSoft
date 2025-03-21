@@ -13,18 +13,14 @@ import (
 )
 
 func main() {
+	config.LoadEnv()
 
-	// Initialize Redis client
 	redis.InitRedis()
-
-	// Load employees into Redis
 	utils.LoadEmployeesToRedis("./employee.json")
 
-	// Set up router
 	router := mux.NewRouter()
 	routes.RegisterRoutes(router)
 
-	// Start server
 	port := config.GetEnv("PORT", "8080")
 	fmt.Println("Server is running on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
