@@ -17,6 +17,7 @@ func main() {
 
 	redis.InitRedis()
 	utils.LoadEmployeesToRedis("./employee.json")
+	go utils.SortCombinedToRedis()
 
 	router := mux.NewRouter()
 	routes.RegisterRoutes(router)

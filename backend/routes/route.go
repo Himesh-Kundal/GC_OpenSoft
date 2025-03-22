@@ -8,4 +8,5 @@ import (
 func RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/emp", handlers.GetEmployeeHandler).Methods("GET")
 	router.HandleFunc("/health", handlers.HealthCheckHandler).Methods("GET")
+	router.HandleFunc("/emps", handlers.GetAllEmployeesHandler).Methods("GET")
 }
