@@ -22,6 +22,7 @@ func LoadEmployeesToRedis(filename string) {
 	}
 
 	for empID, empData := range employees {
+		empData["employeeid"] = empID
 		empJSON, _ := json.Marshal(empData)
 		err := redis.SetValue(empID, string(empJSON))
 		if err != nil {

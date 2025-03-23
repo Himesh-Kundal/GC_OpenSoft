@@ -10,6 +10,7 @@ import (
 	"backend/redis"
 	"backend/routes"
 	"backend/utils"
+	"backend/database"
 )
 
 func main() {
@@ -18,6 +19,8 @@ func main() {
 	redis.InitRedis()
 	utils.LoadEmployeesToRedis("./employee.json")
 	go utils.SortCombinedToRedis()
+
+	database.InitDB()
 
 	router := mux.NewRouter()
 	routes.RegisterRoutes(router)
